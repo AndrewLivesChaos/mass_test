@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "usb_device.h": "c",
+        "fs.h": "c",
+        "flash_map.h": "c",
+        "stdio.h": "c",
+        "ctime": "c",
+        "kernel.h": "c",
+        "time.h": "c",
+        "atomic": "c"
+    }
+}

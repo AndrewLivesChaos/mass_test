@@ -1,0 +1,22 @@
+
+&mt25qu512 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		flash_storage_partition: partition@0 {
+			label = "flash_storage";
+			reg = <0x00000000 0x04000000>;
+		};
+	};
+};
+
+/ {
+	msc_disk0 {
+		compatible = "zephyr,flash-disk";
+		partition = <&flash_storage_partition>;
+		disk-name = "NAND";
+		cache-size = <4096>;
+	};
+};

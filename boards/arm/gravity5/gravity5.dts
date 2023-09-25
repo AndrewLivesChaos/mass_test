@@ -1,0 +1,144 @@
+
+/dts-v1/;
+#include <nordic/nrf52840_qiaa.dtsi>
+#include "gravity5-pinctrl.dtsi"
+
+/ {
+	model = "Gravity5";
+	compatible = "ardesia,gravity5";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_red: led_0 {
+			gpios = < &gpio1 6 GPIO_ACTIVE_LOW >;
+			label = "Led Red";
+		};
+
+		led_green: led_1 {
+			gpios = < &gpio1 4 GPIO_ACTIVE_LOW >;
+			label = "Led Blue";
+		};
+
+		led_blue: led_2 {
+			gpios = < &gpio1 2 GPIO_ACTIVE_LOW >;
+			label = "Led Green";
+		};
+	};
+
+	gpiocustom {
+		compatible = "gpio-keys";
+
+		pwr_en_mcu: gpiocustom_0 {
+			gpios = < &gpio1 8 GPIO_ACTIVE_HIGH >;
+			label = "PWR_EN_MCU";
+		};
+
+		chg_wls_mcu: gpiocustom_1 {
+			gpios = < &gpio0 11 GPIO_ACTIVE_LOW >;
+			label = "CHG_WLS_MCU";
+		};
+
+		touch_mcu: gpiocustom_2 {
+			gpios = < &gpio0 0 GPIO_ACTIVE_HIGH >;
+			label = "TOUCH_MCU";
+		};
+
+		pg_wls_mcu: gpiocustom_3 {
+			gpios = < &gpio0 1 GPIO_ACTIVE_LOW >;
+			label = "PG_WLS_MCU";
+		};
+
+		chg_wrd_mcu: gpiocustom_4 {
+			gpios = < &gpio0 8 GPIO_ACTIVE_LOW >;
+			label = "CHG_WRD_MCU";
+		};
+
+		pg_wrd_mcu: gpiocustom_5 {
+			gpios = < &gpio1 9 GPIO_ACTIVE_LOW >;
+			label = "PG_WRD_MCU";
+		};
+	};
+	aliases {
+		spi-flash0 = &mt25qu512;
+	};
+};
+
+&gpio1 {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&spi0 {
+	status = "okay";
+	max-frequency = < 0x6ACFC0 >;
+};
+
+&qspi {
+	status = "okay";
+	pinctrl-0 = <&qspi_default>;
+	pinctrl-1 = <&qspi_sleep>;
+	pinctrl-names = "default", "sleep";
+
+	mt25qu512: mt25qu512@0 {
+		compatible = "nordic,qspi-nor";
+		reg = <0>;
+		writeoc = "pp4io";
+		readoc = "read4o";
+		sck-frequency = <8000000>;
+		jedec-id = [20 bb 20];
+		sfdp-bfp = [
+			e5 20 fb ff  ff ff ff 1f  29 eb 27 6b  27 3b 27 bb
+			ff ff ff ff  ff ff 27 bb  ff ff 29 eb  0c 20 10 d8
+			0f 52 00 00  24 4a 99 00  8b 8e 03 e1  ac 01 27 38
+			7a 75 7a 75  fb bd d5 5c  4a 0f 82 ff  81 bd 3d 36
+		];
+		size = <536870912>;
+		has-dpd;
+		t-enter-dpd = <10000>;
+		t-exit-dpd = <35000>;
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x0000C000>;
+		};
+		slot0_partition: partition@c000 {
+			label = "image-0";
+			reg = <0x0000C000 0x00067000>;
+		};
+		slot1_partition: partition@73000 {
+			label = "image-1";
+			reg = <0x00073000 0x00067000>;
+		};
+		scratch_partition: partition@da000 {
+			label = "image-scratch";
+			reg = <0x000da000 0x0001e000>;
+		};		
+		storage_partition: partition@f8000 {
+			label = "storage";
+			reg = <0x000f8000 0x00008000>;
+		};
+	};
+};
+
+zephyr_udc0: &usbd {
+	compatible = "nordic,nrf-usbd";
+	status = "okay";
+};
